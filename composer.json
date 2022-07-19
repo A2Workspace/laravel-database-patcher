@@ -1,0 +1,34 @@
+{
+    "name": "a2workspace/laravel-database-patcher",
+    "description": "一個基於專案的資料庫補丁管理工具",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shishamou",
+            "email": "shishatw225@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "6.x"
+    },
+    "autoload": {
+        "psr-4": {
+            "A2Workspace\\DatabasePatcher\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "A2Workspace\\DatabasePatcher\\ServiceProvider"
+            ]
+        }
+    }
+}

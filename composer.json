@@ -30,5 +30,13 @@
                 "A2Workspace\\DatabasePatcher\\ServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit"
+        ],
+        "test-coverage": [
+            "vendor/bin/phpunit --coverage-html coverage"
+        ]
     }
 }

@@ -196,8 +196,12 @@ class DbPatchCommand extends Command
     protected function callMigrateCommand($path, string $command = 'migrate'): int
     {
         if ($this->shouldUseRealPath($path)) {
-            $this->info("Running: php artisan {$command} --realpath={$path}");
-            $this->call($command, ['--realpath' => $path]);
+            $this->info("Running: php artisan {$command} --path={$path} --realpath");
+
+            $this->call($command, [
+                '--path' => $path,
+                '--realpath' => true,
+            ]);
         } else {
             $path = Str::after($path, base_path());
 

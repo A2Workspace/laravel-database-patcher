@@ -2,10 +2,9 @@
 
 namespace A2Workspace\DatabasePatcher\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -195,31 +194,11 @@ class DbPatchCommand extends Command
      */
     protected function callMigrateCommand($path, string $command = 'migrate'): int
     {
-        if ($this->shouldUseRealPath($path)) {
-            $this->info("Running: php artisan {$command} --path={$path} --realpath");
+        $path = Str::after($path, base_path());
 
-            $this->call($command, [
-                '--path' => $path,
-                '--realpath' => true,
-            ]);
-        } else {
-            $path = Str::after($path, base_path());
-
-            $this->info("Running: php artisan {$command} --path={$path}");
-            $this->call($command, ['--path' => $path]);
-        }
+        $this->info("Running: php artisan {$command} --path={$path}");
+        $this->call($command, ['--path' => $path]);
 
         return 0;
-    }
-
-    /**
-     * 判定是否該使用完整路徑傳入
-     *
-     * @param  string  $path
-     * @return bool
-     */
-    protected function shouldUseRealPath($path): bool
-    {
-        return ! Str::startsWith($path, base_path());
     }
 }

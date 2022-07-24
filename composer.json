@@ -13,7 +13,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "6.x",
-        "doctrine/dbal": ">=2.12.1"
+        "doctrine/dbal": "^2.12.1"
     },
     "autoload": {
         "psr-4": {

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPriorityToProductsTable extends Migration
+class AddSoftDeletesToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class AddPriorityToProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->tinyInteger('priority')->comment('優先度')
-                ->default(0);
+        Schema::table('users', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -26,9 +25,9 @@ class AddPriorityToProductsTable extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            if (Schema::hasColumn($table->getTable(), 'priority')) {
-                $table->dropColumn('priority');
+        Schema::table('users', function (Blueprint $table) {
+            if (Schema::hasColumn($table->getTable(), 'deleted_at')) {
+                $table->dropColumn('deleted_at');
             }
         });
     }

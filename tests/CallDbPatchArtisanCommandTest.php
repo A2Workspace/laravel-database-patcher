@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Illuminate\Testing\PendingCommand;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,10 +18,9 @@ class CallDbPatchArtisanCommandTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('ian')->unique();
-            $table->string('name');
+            $table->string('username');
         });
 
         if (empty(static::$published)) {
@@ -35,8 +34,7 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        @unlink(static::$published);
-        @rmdir(static::$published);
+        (new Filesystem)->cleanDirectory(static::$published);
     }
 
     // =========================================================================
@@ -49,15 +47,15 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
         $command->expectsChoice(
             '選擇補丁檔案',
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
+            $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table'),
             [
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
+                $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table')
             ],
         );
 
         $command->expectsOutput(sprintf(
             'Running: php artisan migrate --path=%s',
-            $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
+            $this->resolvePath('/database/patches/2022_07_19_000000_add_soft_deletes_to_users_table.php')
         ));
 
         $command->assertExitCode(0);
@@ -65,10 +63,10 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
         $this->assertDatabaseHas(
             'migrations',
-            ['migration' => '2022_07_19_000000_add_priority_to_products_table']
+            ['migration' => '2022_07_19_000000_add_soft_deletes_to_users_table']
         );
 
-        $this->assertDatabaseTableHasColumn('products', 'priority');
+        $this->assertDatabaseTableHasColumn('users', 'deleted_at');
     }
 
     public function test_call_artisan_command_and_revert()
@@ -76,9 +74,9 @@ class CallDbPatchArtisanCommandTest extends TestCase
         $this->artisan('db:patch')
             ->expectsChoice(
                 '選擇補丁檔案',
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
+                $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table'),
                 [
-                    $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
+                    $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table')
                 ],
             )
             ->assertExitCode(0)
@@ -88,45 +86,45 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
         $command2->expectsChoice(
             '選擇補丁檔案',
-            $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table'),
+            $this->parseInstalledLabel('2022_07_19_000000_add_soft_deletes_to_users_table'),
             [
-                $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table')
+                $this->parseInstalledLabel('2022_07_19_000000_add_soft_deletes_to_users_table')
             ],
         );
 
         $command2->expectsOutput(sprintf(
             'Running: php artisan migrate:rollback --path=%s',
-            $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
+            $this->resolvePath('/database/patches/2022_07_19_000000_add_soft_deletes_to_users_table.php')
         ));
 
         $command2->assertExitCode(0);
         $command2->run();
 
-        $this->assertDatabaseTableMissingColumn('products', 'priority');
+        $this->assertDatabaseTableMissingColumn('users', 'deleted_at');
 
         $this->assertDatabaseMissing(
             'migrations',
-            ['migration' => '2022_07_19_000000_add_priority_to_products_table']
+            ['migration' => '2022_07_19_000000_add_soft_deletes_to_users_table']
         );
     }
 
     public function test_call_artisan_command_with_filter()
     {
         $command = $this->artisan('db:patch', [
-            'filter' => 'product',
+            'filter' => 'users',
         ]);
 
         $command->expectsChoice(
             '選擇補丁檔案',
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
+            $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table'),
             [
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
+                $this->parseLabel('2022_07_19_000000_add_soft_deletes_to_users_table')
             ],
         );
 
         $command->expectsOutput(sprintf(
             'Running: php artisan migrate --path=%s',
-            $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
+            $this->resolvePath('/database/patches/2022_07_19_000000_add_soft_deletes_to_users_table.php')
         ));
 
         $command->assertExitCode(0);
@@ -134,10 +132,10 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
         $this->assertDatabaseHas(
             'migrations',
-            ['migration' => '2022_07_19_000000_add_priority_to_products_table']
+            ['migration' => '2022_07_19_000000_add_soft_deletes_to_users_table']
         );
 
-        $this->assertDatabaseTableHasColumn('products', 'priority');
+        $this->assertDatabaseTableHasColumn('users', 'deleted_at');
     }
 
     public function test_call_artisan_command_with_filter_then_not_found()

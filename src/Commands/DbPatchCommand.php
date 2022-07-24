@@ -171,18 +171,9 @@ class DbPatchCommand extends Command
 
         $input = $this->choice($question, $options);
 
-        // 這裡我們將輸入轉換回 SplFileInfo
-        // 並處理特殊例外的情形
-        $matches = $formattedFiles->first(function ($value) use ($input) {
+        return $formattedFiles->first(function ($value) use ($input) {
             return $value[0] === $input;
-        });
-
-        if (empty($matches)) {
-            dd($input, $options);
-            throw new RuntimeException;
-        }
-
-        return $matches[1];
+        })[1];
     }
 
     /**

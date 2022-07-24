@@ -12,7 +12,8 @@
         "php": "^7.4|^8.0"
     },
     "require-dev": {
-        "orchestra/testbench": "6.x"
+        "orchestra/testbench": "6.x",
+        "doctrine/dbal": "^2.12.1"
     },
     "autoload": {
         "psr-4": {
@@ -30,5 +31,13 @@
                 "A2Workspace\\DatabasePatcher\\ServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit"
+        ],
+        "test-coverage": [
+            "vendor/bin/phpunit --coverage-html coverage"
+        ]
     }
 }

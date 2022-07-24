@@ -2,10 +2,9 @@
 
 namespace A2Workspace\DatabasePatcher\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -47,7 +46,7 @@ class DbPatchCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $file = $this->determinePatchFile();
         if (!$file) {
@@ -55,36 +54,24 @@ class DbPatchCommand extends Command
         }
 
         $path = $file->getRealPath();
-        $path = Str::after($path, base_path());
 
-        // 這邊我們判斷
-        // 若為回復模式則呼叫滾回命令並傳入補丁檔案路徑
-        if ($this->option('revert')) {
-            $this->info("Running: php artisan migrate:rollback --path={$path}");
-
-            $this->call('migrate:rollback', [
-                '--path' => $path,
-            ]);
+        if ($this->usingRevertion()) {
+            return $this->callMigrateCommand($path, 'migrate:rollback');
         }
 
-        // 呼叫遷移命令並傳入補丁檔案路徑
-        else {
-            $this->info("Running: php artisan migrate --path={$path}");
-
-            $this->call('migrate', [
-                '--path' => $path,
-            ]);
-        }
-
-        return 0;
+        return $this->callMigrateCommand($path);
     }
+
+    // =========================================================================
+    // = DeterminePatchFile()
+    // =========================================================================
 
     /**
      * 決定要被使用的檔案
      *
      * @return \Symfony\Component\Finder\SplFileInfo|null
      */
-    protected function determinePatchFile()
+    protected function determinePatchFile(): ?SplFileInfo
     {
         // 取得 patches 目錄的檔案列表，若結果為空則提前終止
         $files = $this->getFileList();
@@ -125,7 +112,7 @@ class DbPatchCommand extends Command
      */
     protected function getFileList(): Collection
     {
-        $paths = [database_path('patches')];
+        $paths = $this->laravel['config']['database.patcher.paths'] ?? database_path('patches');
 
         return collect($paths)
             ->map(fn ($path) => $this->getFileListInDirectory($path))
@@ -144,6 +131,7 @@ class DbPatchCommand extends Command
             ->filter(function (SplFileInfo $file) {
                 return !in_array($file->getRelativePathname(), $this->excludedNames);
             })
+            ->ignoreDotFiles(true)
             ->files()
             ->in($path)
             ->depth(0)
@@ -177,5 +165,40 @@ class DbPatchCommand extends Command
         return $formattedFiles->first(function ($value) use ($input) {
             return $value[0] === $input;
         })[1];
+    }
+
+    // =========================================================================
+    // = UsingRevertion()
+    // =========================================================================
+
+    /**
+     * 判定是否為 revert 模式
+     *
+     * @return bool
+     */
+    protected function usingRevertion(): bool
+    {
+        return $this->input->hasOption('revert') && $this->option('revert');
+    }
+
+    // =========================================================================
+    // = CallMigrateCommand()
+    // =========================================================================
+
+    /**
+     * 呼叫運行 migrate 指令並傳入路徑
+     *
+     * @param  string  $path
+     * @param  string  $command
+     * @return int
+     */
+    protected function callMigrateCommand($path, string $command = 'migrate'): int
+    {
+        $path = Str::after($path, base_path());
+
+        $this->info("Running: php artisan {$command} --path={$path}");
+        $this->call($command, ['--path' => $path]);
+
+        return 0;
     }
 }

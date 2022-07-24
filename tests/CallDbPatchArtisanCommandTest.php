@@ -144,4 +144,15 @@ class CallDbPatchArtisanCommandTest extends TestCase
         $command->assertExitCode(1);
         $command->run();
     }
+
+    public function test_call_artisan_command_when_directory_is_empty()
+    {
+        $this->app->config->set('database.patcher.paths', []);
+
+        $command = $this->artisan('db:patch');
+
+        $command->expectsOutput('找不到任何補丁檔案');
+        $command->assertExitCode(1);
+        $command->run();
+    }
 }

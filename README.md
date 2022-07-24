@@ -1,5 +1,7 @@
 # A2Workspace/Laravel-Database-Patcher
 
+<p align="center"><img src="/.github/animation.gif" alt="Laravel-Database-Patcher demo animation"></p>
+
 一個基於專案的資料庫補丁管理工具。
 
 

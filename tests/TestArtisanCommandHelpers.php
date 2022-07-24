@@ -16,7 +16,16 @@ trait TestArtisanCommandHelpers
     }
 
     /**
-     * @param  string  $table
+     * @param  string  $option
+     * @return string
+     */
+    private function parseInstalledLabel(string $option): string
+    {
+        return "-> <fg=yellow>Installed: {$option}</fg=yellow>";
+    }
+
+    /**
+     * @param  strle
      * @param  string  $column
      * @return self
      */
@@ -53,3 +62,4 @@ trait TestArtisanCommandHelpers
         return $this;
     }
 }
+

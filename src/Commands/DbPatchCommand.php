@@ -2,9 +2,12 @@
 
 namespace A2Workspace\DatabasePatcher\Commands;
 
+use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -149,13 +152,19 @@ class DbPatchCommand extends Command
      */
     protected function choiceFromFileList($question, Collection $files): SplFileInfo
     {
-        $formattedFiles = $files->map(function (SplFileInfo $file) {
-            $label = $file->getRelativePathname();
+        $migrations = $this->getInstalledMigrations();
+
+        $formattedFiles = $files->map(function (SplFileInfo $file) use ($migrations) {
+            $filename = $file->getRelativePathname();
+
+            $filename = Str::beforeLast($filename, '.php');
+
+            $label = (in_array($filename, $migrations))
+                ? "<fg=yellow>Installed: {$filename}</fg=yellow>"
+                : $filename;
 
             // 加上符號隔開避免 choice 時索引與檔案名稱混淆 (這應該是 Symfony 的 bug 待查證)
-            $label = "-> {$label}";
-
-            return [$label, $file];
+            return ["-> {$label}", $file];
         });
 
         $options = $formattedFiles->pluck(0)->toArray();
@@ -165,6 +174,23 @@ class DbPatchCommand extends Command
         return $formattedFiles->first(function ($value) use ($input) {
             return $value[0] === $input;
         })[1];
+    }
+
+    /**
+     * Get the list of installed migration.
+     *
+     * @return array
+     */
+    private function getInstalledMigrations(): array
+    {
+        if (! Schema::hasTable('migrations')) {
+            return [];
+        }
+
+        return DB::table('migrations')
+            ->get('migration')
+            ->pluck('migration')
+            ->toArray();
     }
 
     // =========================================================================

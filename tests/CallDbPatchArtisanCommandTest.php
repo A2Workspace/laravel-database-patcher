@@ -45,17 +45,13 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
     public function test_call_artisan_command()
     {
-        // =====================================================================
-        // = Step 1: Install specified patch file.
-        // =====================================================================
-
         $command = $this->artisan('db:patch');
 
         $command->expectsChoice(
             '選擇補丁檔案',
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
             [
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
             ],
         );
 
@@ -73,18 +69,28 @@ class CallDbPatchArtisanCommandTest extends TestCase
         );
 
         $this->assertDatabaseTableHasColumn('products', 'priority');
+    }
 
-        // =====================================================================
-        // = Step 2: Revert it.
-        // =====================================================================
+    public function test_call_artisan_command_and_revert()
+    {
+        $this->artisan('db:patch')
+            ->expectsChoice(
+                '選擇補丁檔案',
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
+                [
+                    $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
+                ],
+            )
+            ->assertExitCode(0)
+            ->run();
 
         $command2 = $this->artisan('db:patch', ['--revert' => true]);
 
         $command2->expectsChoice(
             '選擇補丁檔案',
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table'),
             [
-                $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table.php')
+                $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table')
             ],
         );
 
@@ -112,9 +118,9 @@ class CallDbPatchArtisanCommandTest extends TestCase
 
         $command->expectsChoice(
             '選擇補丁檔案',
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table'),
             [
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table')
             ],
         );
 

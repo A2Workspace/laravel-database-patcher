@@ -16,6 +16,15 @@ trait TestArtisanCommandHelpers
     }
 
     /**
+     * @param  string  $option
+     * @return string
+     */
+    private function parseInstalledLabel(string $option): string
+    {
+        return "-> Installed: {$option}";
+    }
+
+    /**
      * @param  string  $table
      * @param  string  $column
      * @return self

@@ -84,7 +84,7 @@ class CallDbPatchArtisanCommandTest extends TestCase
             '選擇補丁檔案',
             $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
             [
-                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+                $this->parseInstalledLabel('2022_07_19_000000_add_priority_to_products_table.php')
             ],
         );
 

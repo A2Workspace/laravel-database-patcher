@@ -33,4 +33,23 @@ trait TestArtisanCommandHelpers
 
         return $this;
     }
+
+    /**
+     * @param  string  $table
+     * @param  string  $column
+     * @return self
+     */
+    private function assertDatabaseTableMissingColumn($table, $column)
+    {
+        $this->assertFalse(
+            Schema::hasColumn($table, $column),
+            sprintf(
+                'The table [%s] have the column named %s',
+                $table,
+                $column
+            )
+        );
+
+        return $this;
+    }
 }

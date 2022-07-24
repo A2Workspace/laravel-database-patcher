@@ -39,32 +39,24 @@ class CallDbPatchArtisanCommandTest extends TestCase
         @rmdir(static::$published);
     }
 
-    private function expectsCommandChoice(PendingCommand $command, $answer): PendingCommand
-    {
-        $options = [
-            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
-        ];
-
-        $command->expectsChoice(
-            '選擇補丁檔案',
-            $this->parseLabel($answer),
-            $options,
-        );
-
-        return $command;
-    }
-
     // =========================================================================
     // = Tests
     // =========================================================================
 
     public function test_call_artisan_command()
     {
+        // =====================================================================
+        // = Step 1: Install specified patch file.
+        // =====================================================================
+
         $command = $this->artisan('db:patch');
 
-        $this->expectsCommandChoice(
-            $command,
-            '2022_07_19_000000_add_priority_to_products_table.php'
+        $command->expectsChoice(
+            '選擇補丁檔案',
+            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            [
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+            ],
         );
 
         $command->expectsOutput(sprintf(
@@ -72,6 +64,7 @@ class CallDbPatchArtisanCommandTest extends TestCase
             $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
         ));
 
+        $command->assertExitCode(0);
         $command->run();
 
         $this->assertDatabaseHas(
@@ -80,9 +73,36 @@ class CallDbPatchArtisanCommandTest extends TestCase
         );
 
         $this->assertDatabaseTableHasColumn('products', 'priority');
-    }
 
-    //  @depends
+        // =====================================================================
+        // = Step 2: Revert it.
+        // =====================================================================
+
+        $command2 = $this->artisan('db:patch', ['--revert' => true]);
+
+        $command2->expectsChoice(
+            '選擇補丁檔案',
+            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            [
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+            ],
+        );
+
+        $command2->expectsOutput(sprintf(
+            'Running: php artisan migrate:rollback --path=%s',
+            $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
+        ));
+
+        $command2->assertExitCode(0);
+        $command2->run();
+
+        $this->assertDatabaseTableMissingColumn('products', 'priority');
+
+        $this->assertDatabaseMissing(
+            'migrations',
+            ['migration' => '2022_07_19_000000_add_priority_to_products_table']
+        );
+    }
 
     public function test_call_artisan_command_with_filter()
     {
@@ -90,9 +110,12 @@ class CallDbPatchArtisanCommandTest extends TestCase
             'filter' => 'product',
         ]);
 
-        $this->expectsCommandChoice(
-            $command,
-            '2022_07_19_000000_add_priority_to_products_table.php'
+        $command->expectsChoice(
+            '選擇補丁檔案',
+            $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php'),
+            [
+                $this->parseLabel('2022_07_19_000000_add_priority_to_products_table.php')
+            ],
         );
 
         $command->expectsOutput(sprintf(
@@ -100,6 +123,7 @@ class CallDbPatchArtisanCommandTest extends TestCase
             $this->resolvePath('/database/patches/2022_07_19_000000_add_priority_to_products_table.php')
         ));
 
+        $command->assertExitCode(0);
         $command->run();
 
         $this->assertDatabaseHas(

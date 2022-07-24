@@ -13,11 +13,10 @@
 
 ## Installation | 安裝
 
-此套件尚未發布到 **Packagist** 需透過下列方法安裝：
+執行下列命令透過 **composer** 引入到你的 **Laravel** 專案:
 
 ```
-composer config repositories.laravel-database-patcher vcs https://github.com/A2Workspace/laravel-database-patcher.git
-composer require "a2workspace/laravel-database-patcher:*"
+composer require a2workspace/laravel-database-patcher
 ```
 
 接著使用 `vendor:publish` 命令生成 `database/patches` 資料夾:

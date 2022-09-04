@@ -1,8 +1,26 @@
-# A2Workspace/Laravel-Database-Patcher
-
+<h1 align="center">Laravel-Database-Patcher</h1>
+<p align="center">
+<a href="https://github.com/A2Workspace/laravel-database-patcher">
+    <img alt="" src="https://github.com/A2Workspace/laravel-database-patcher/actions/workflows/coverage.yml/badge.svg">
+</a>
+<a href="https://github.com/A2Workspace/laravel-database-patcher">
+    <img alt="" src="https://img.shields.io/github/workflow/status/A2Workspace/laravel-database-patcher/tests?style=flat-square">
+</a>
+<a href="https://codecov.io/gh/A2Workspace/laravel-database-patcher">
+    <img alt="" src="https://img.shields.io/codecov/c/github/A2Workspace/laravel-database-patcher.svg?style=flat-square">
+</a>
+<a href="https://github.com/A2Workspace/laravel-database-patcher/blob/master/LICENSE">
+    <img alt="" src="https://img.shields.io/github/license/A2Workspace/laravel-database-patcher?style=flat-square">
+</a>
+<a href="https://packagist.org/packages/a2workspace/laravel-database-patcher">
+    <img alt="" src="https://img.shields.io/packagist/v/a2workspace/laravel-database-patcher.svg?style=flat-square">
+</a>
+<a href="https://packagist.org/packages/a2workspace/laravel-database-patcher">
+    <img alt="" src="https://img.shields.io/packagist/dt/a2workspace/laravel-database-patcher.svg?style=flat-square">
+</a>
+</p>
+<p align="center">一個基於專案的資料庫補丁管理工具。</p>
 <p align="center"><img src="/.github/animation.gif" alt="Laravel-Database-Patcher demo animation"></p>
-
-一個基於專案的資料庫補丁管理工具。
 
 隨著專案的進行，難免需要對現有的資料表修修補補，但檔案過於複雜的 `database/migrations` 可能會產生一些問題。`a2workspace/laravel-database-patcher` 提供簡易的管理工具，讓你可以使用獨立的 `database/patches` 資料夾，來放置額外的 **遷移檔 (Migration)** 。
 
